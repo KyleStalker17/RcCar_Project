@@ -16,22 +16,29 @@
 #define Key2 9
 #define Key3 10
 
-//create variables
-int ID = 0;// the reciever will only execute instructions from the controller with the correct ID. ID is set using a physical key that flips switches. 
+int ID = 0;// the reciever will only execute instructions from the controller with the correct ID. ID is set using a physical key that flips switches.
+
+// Movement variables
 int gas = 0;
-int left = 0;
-int right = 0;
 int steer = 0;
 int brake = 0;
+
+//head position variables
 float head = 0;
+float heading = 0;
+float headingDegrees = 0;
+int x, y, z;//compass heading variable
+
+//head/taillight control variables
 bool light = false;
 int leftcount = 0;
 bool leftlight = 0;
 int rightcount = 0;
 bool rightlight = 0;
 bool lighttemp = false;
-float heading = 0;
-float headingDegrees = 0;
+int left = 0;
+int right = 0;
+
 
 //Key switch variables
 bool k0 = false;
@@ -39,7 +46,6 @@ bool k1 = false;
 bool k2 = false;
 bool k3 = false;
 
-int x, y, z;//compass heading variable
 
 //library variables
 RH_ASK driver;
@@ -63,7 +69,7 @@ void setup()
 
 void loop()
 {
-  uint8_t data[7]; //a variable to store all of the values which need to be sent
+  uint8_t data[8]; //a variable to store all of the values which need to be sent
   
   //collect data
   data[0] = ID;
@@ -74,7 +80,7 @@ void loop()
   data[5] = left;
   data[6] = light;
   data[7] = head;
-
+  data[8] = reverse;
   //send data
   uint8_t datalen = sizeof(data);
   driver.send((uint8_t*)data, sizeof(data));

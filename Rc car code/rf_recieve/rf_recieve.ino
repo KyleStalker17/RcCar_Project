@@ -133,7 +133,7 @@ void loop()
       }
     }
     throttle = throttle - (Brake); //The brake will always be a little bit applied, so the car will slow to a stop without throttle
-      if ((throttle < 1500)&&(reverse == 0)) { //make sure we're not going backwards
+      if ((throttle < 1500)&&(reverse == 0)) { //make sure we're not going backwards if the car is in forward gear
         throttle = 1500;
       }
       Motor.write(throttle);//Send the throttle data to the driving servo
@@ -143,7 +143,7 @@ void loop()
 
 
       //headlights, tailights, and turn signals
-      if (Brake > 6) { //turn on the brake lights if the brake is pressed enough
+      if (data[3] > 3) { //turn on the brake lights if the brake is pressed enough
         Bleft = 1;
         Bright = 1;
       }
