@@ -1,0 +1,1 @@
+This is a simple transmission sketch that I basically copied straight from the internet. If I'm having trouble transmitting, I upload this sketch to make sure it isn't a problem with my code.

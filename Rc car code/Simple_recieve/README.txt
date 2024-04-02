@@ -1,0 +1,1 @@
+This is a simple recieving sketch that I basically copied straight from the internet. If I'm having trouble recieving, I upload this sketch to mkae sure it isn't a problem with my code.

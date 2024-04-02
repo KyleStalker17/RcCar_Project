@@ -44,9 +44,7 @@ bool right = false;
 int leftcount = 0;
 int rightcount = 0;
 
-
-
-//this ID determines which controller is used to control the car
+//this ID determines which controller is used to control the car.
 int ID = 1;
 
 //Driving control variables
@@ -79,17 +77,17 @@ void loop()
 {
 
 
-  
+
   uint8_t data[7];//create a variable to put the data in
   uint8_t datalen = sizeof(data);//create a varibale to get the size of the data
   if (driver.recv(data, &datalen)) // If we receive a transmission of the correct length,
   {
     if (data[0] == ID) {//check ID. If the ID is wrong, the message came from a different controller and is ignored.
-      
-      
-      
-      
-      
+
+
+
+
+
       //Set variables based on the recieved data
       angle = (data[2]);
       Throttle_temp = (data[1]);//The throttle needs to look at the throttle from the previous iteration and the new data, so this will just be a variable in the throttle formula
@@ -101,8 +99,8 @@ void loop()
       reverse = data[8];
 
 
-      
-      
+
+
       //brake
       Brake = (Brake / bpressure);//this number determines brake sensitivity
       if (Brake < 4) { //make sure the brake is always at least a little bit on so the car will slowly come to a stop when the throttle is released
@@ -121,19 +119,19 @@ void loop()
 
       //throttle
       Throttle_temp = ((Throttle_temp * 8) + 1500); //math to set throttle properly
-      if (reverse == 0){//if the car is in forward
-      if (throttle < Throttle_temp) { //if the car is speeding up,
+      if (reverse == 0) { //if the car is in forward
+        if (throttle < Throttle_temp) { //if the car is speeding up,
           throttle += accel;//this determines throttle sensitivity
         }
       }
       else { //if the car is in reverse
         Throttle_temp = (Throttle_temp * -1);
         if (throttle > Throttle_temp) {
-          throttle -=5;
+          throttle -= 5;
+        }
       }
-    }
-    throttle = throttle - (Brake); //The brake will always be a little bit applied, so the car will slow to a stop without throttle
-      if ((throttle < 1500)&&(reverse == 0)) { //make sure we're not going backwards if the car is in forward gear
+      throttle = throttle - (Brake); //The brake will always be a little bit applied, so the car will slow to a stop without throttle
+      if ((throttle < 1500) && (reverse == 0)) { //make sure we're not going backwards if the car is in forward gear
         throttle = 1500;
       }
       Motor.write(throttle);//Send the throttle data to the driving servo
@@ -187,7 +185,7 @@ void loop()
         else {
           Fright = 0;
           Bright = 0;
-          rightcount = rightcount + 1;
+          rightcount += 1;
           if (rightcount >= 10) {
             rightcount = 0;
           }
@@ -205,7 +203,7 @@ void loop()
 
 
 
-      
+
       //camera rotation servo control
       head = (((head * 2) * (1500 / 360)) + 700); //math for correct servo value
       hangle.write(head);//send the data to the camera servo
@@ -214,7 +212,7 @@ void loop()
 
 
 
-      
+
       //all the rest is just for development purposes and will be deleted/commented out in the final version
       Serial.print (data[0]);
       Serial.print(",");
@@ -242,7 +240,7 @@ void loop()
       Serial.print(",");
       Serial.print(Bright);
       Serial.print(","),
-      Serial.print(Bleft);
+                   Serial.print(Bleft);
       Serial.print(",");
       Serial.print(Throttle_temp);
       Serial.print(",");

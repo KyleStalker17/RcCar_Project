@@ -70,7 +70,7 @@ void setup()
 void loop()
 {
   uint8_t data[8]; //a variable to store all of the values which need to be sent
-  
+
   //collect data
   data[0] = ID;
   data[1] = gas;
@@ -81,6 +81,7 @@ void loop()
   data[6] = light;
   data[7] = head;
   data[8] = reverse;
+
   //send data
   uint8_t datalen = sizeof(data);
   driver.send((uint8_t*)data, sizeof(data));
@@ -93,15 +94,15 @@ void loop()
   heading += 0.01126;// Account for local magnetic declination
   if (heading < 0);//account for cases where the heading is less than 1
   heading += 2 * PI;
-  if (heading > 2*PI);//account for if the heading is greater than 360 degrees
+  if (heading > 2 * PI); //account for if the heading is greater than 360 degrees
   heading -= 2 * PI;
   headingDegrees = heading * 180 / M_PI;//convert to degrees
   Serial.print (heading);
   Serial.print(",");
   Serial.println (headingDegrees);
-  head = (headingDegrees/1.40625);//(1.40625 = 360 degrees /256). convert to a number small enough to be sent over
+  head = (headingDegrees / 1.40625); //(1.40625 = 360 degrees /256). convert to a number small enough to be sent over
 
-  
+
   //read all of the analog and digital input pins. A quirk with the radiohead library means that the values can't be larger than 256, so the analog values get divided by 10. We lose a little bit of resolution, but it's not a significant amount.
   brake = analogRead(braking);
   brake = (brake / 10);
@@ -112,7 +113,7 @@ void loop()
   left = digitalRead(leftPin);
   right = digitalRead(rightPin);
   light = digitalRead(Light);
-  
+
   //set the ID from the key.
   k0 = digitalRead(Key0);
   k1 = digitalRead(Key1);
