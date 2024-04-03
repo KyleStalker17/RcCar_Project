@@ -16,5 +16,5 @@ void loop()
     driver.send((uint8_t *)msg, strlen(msg));
     driver.waitPacketSent();
     Serial.println(msg);
-    delay(100);
+    delay(500);
 }
