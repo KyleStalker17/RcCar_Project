@@ -87,29 +87,52 @@ void loop()
             Serial.println(buf[9]);
       */
 
+
+
       steer = ((steer * 15) + 700);
       Wheel.write(steer);
 
 
+
+
       gas_temp = ((gas_temp * 15) + 700);
-      if (gas < gas_temp) {
+
+
+      if ((gas < gas_temp) && (reverse = false)) {
         gas += acc;
       }
+      if ((gas > gas_temp) && (reverse = true)) {
+        gas -= acc;
+      }
+
       if (gas > 2200) {
         gas = 2200;
       }
-
+      if (gas < 700) {
+        gas = 700;
+      }
       brake = (brake / bpress);
       if (brake < 5) {
         brake = 5;
       }
+
+      if (reverse = false){
       gas = (gas - brake);
-      if (gas < 1500) {
+      }
+      else{
+        gas = (gas+brake);
+      }
+      
+      if ((gas < 1500)&&(reverse = false)){
         gas = 1500;
       }
-      Motor.write(gas);
+
       
-      head = (head*6.491);
+      Motor.write(gas);
+
+
+
+      head = (head * 6.491);
       head = (head + 700);
       Serial.print(head);
       Serial.print(",");
