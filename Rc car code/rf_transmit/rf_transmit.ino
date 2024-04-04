@@ -1,5 +1,4 @@
 //include libraries
-#include <QMC5883L.h>//compass library
 #include <RH_ASK.h> // radiohead library
 #include <SPI.h> // Not actually used but needed to compile
 #include <Wire.h> // I2C library used to communicate with the compass module
@@ -53,7 +52,6 @@ bool k3 = false;
 
 //library variables
 RH_ASK driver;
-QMC5883L compass;
 
 void setup()
 {
