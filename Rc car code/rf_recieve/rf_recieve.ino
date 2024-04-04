@@ -108,10 +108,13 @@ void loop()
         gas = 1500;
       }
       Motor.write(gas);
-      Serial.print(gas);
+      
+      head = (head*6.491);
+      head = (head + 700);
+      Serial.print(head);
       Serial.print(",");
-      Serial.println(buf[3]);
-
+      Serial.println(buf[7]);
+      Cam.write(head);
 
       if (light == true) {
         digitalWrite(Fright, HIGH);
@@ -145,7 +148,7 @@ void loop()
           leftcounter = 0;
         }
       }
-      else{
+      else {
         leftcounter = 0;
       }
       if (right == true) {
@@ -162,7 +165,7 @@ void loop()
           rightcounter = 0;
         }
       }
-      else{
+      else {
         rightcounter = 0;
       }
     }
