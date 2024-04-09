@@ -79,39 +79,39 @@ void loop()
       left = buf[5];
       light = buf[6];
       head = buf[7];
-      reverse = buf[9];
+      reverse = buf[8];
+      /*
+                  Serial.print(buf[0]);
+                  Serial.print(",");
+                  Serial.print(buf[1]);
+                  Serial.print(",");
+                  Serial.print(buf[2]);
+                  Serial.print(",");
+                  Serial.print(buf[3]);
+                  Serial.print(",");
+                  Serial.print(buf[4]);
+                  Serial.print(",");
+                  Serial.print(buf[5]);
+                  Serial.print(",");
+                  Serial.print(buf[6]);
+                  Serial.print(",");
+                  Serial.print(buf[7]);
+                  Serial.print(",");
+                  Serial.print(buf[8]);
+                  Serial.print(",");
+                  Serial.println(reverse);
 
-      /*      Serial.print(buf[0]);
-            Serial.print(",");
-            Serial.print(buf[1]);
-            Serial.print(",");
-            Serial.print(buf[2]);
-            Serial.print(",");
-            Serial.print(buf[3]);
-            Serial.print(",");
-            Serial.print(buf[4]);
-            Serial.print(",");
-            Serial.print(buf[5]);
-            Serial.print(",");
-            Serial.print(buf[6]);
-            Serial.print(",");
-            Serial.print(buf[7]);
-            Serial.print(",");
-            Serial.print(buf[8]);
-            Serial.print(",");
-            Serial.println(buf[9]);
       */
-
       //Steering
       steer = ((steer * 15) + 700);//Make sure it's the right value for the servo. This servo library requires values between 700 and 2200, with 1500 being the middle.
       Wheel.write(steer);
 
-      //Motion
+      //forward/backwards Motion
       gas_temp = ((gas_temp * 15) + 700);//Make sure it's the right value for the servo.
-      if ((gas < gas_temp) && (reverse = false)) { //if the current speed is less than the desired speed and the car is in forward gear, speed up a little. This is to make sure the car can't accelerate instantly and has a sense of mass.
+      if ((gas < gas_temp) && (reverse == false)) { //if the current speed is less than the desired speed and the car is in forward gear, speed up a little. This is to make sure the car can't accelerate instantly and has a sense of mass.
         gas += acc;
       }
-      if ((gas > gas_temp) && (reverse = true)) {//If the car is in reverse gear, speed up backwards a little more each loop until we reach the desired speed.
+      if ((gas < gas_temp) && (reverse == true)) {//If the car is in reverse gear, speed up backwards a little more each loop until we reach the desired speed.
         gas -= acc;
       }
 
@@ -126,21 +126,12 @@ void loop()
         brake = 5;
       }
 
-      if (reverse = false) { //If the car is moving forward, move the throttle value down by however much the brake is applied.
+      if (gas > 1500) { //If the car is moving forward, move the throttle value down by however much the brake is applied.
         gas = (gas - brake);
       }
       else {
         gas = (gas + brake); //If the car is in reverse gear, move the throttle value up by however much the brake is applied.
       }
-
-      if ((gas < 1500) && (reverse = false)) { //Make sure the car doesn't start moving backwards if the car is in forward gear
-        gas = 1500;
-      }
-
-      if ((gas > 1500) && (reverse = true)) { //Make sure the car can't move forward if it's in reverse gear
-        gas = 1500;
-      }
-
 
       Motor.write(gas);//send instructions to the drive servo
 
@@ -149,7 +140,8 @@ void loop()
       head = (head * 6.491);//math for servo value
       head = (head + 700);//make sure the minimum value is 700, or all the way left.
       Cam.write(head);//send to camera servo
-
+      Serial.print(head);
+      Serial.println(",");
       if (light == true) {//If the headlights need to be on, tell the headlights to turn on. This action won't actually be taken until all the light data is collected because we still need to check if the turn signal is on or off.
         FrightOn = true;
         FleftOn = true;
@@ -164,8 +156,8 @@ void loop()
         BleftOn = true;
       }
       else {
-        FrightOn = false;//If the brakes have been let off, turn off the brake lights.
-        FleftOn = false;
+        BrightOn = false;//If the brakes have been let off, turn off the brake lights.
+        BleftOn = false;
       }
 
       if (left == true) { //If the left turn signal is on, flip the left side lights on and off. If the headlights or brake lights are on, ignore them on this side and do this instead.
@@ -186,8 +178,8 @@ void loop()
         leftcounter = 0;//If the turn signal goes off, reset the counter at zero for next time. This way it will always flash first, and won't pick up where it left off.
       }
 
-      
-      if (right == true) {//This is the same as the left side, except all of the variables correspond to th right side.
+
+      if (right == true) {//This is the same as the left side, except all of the variables correspond to the right side.
         rightcounter += 1;
         if (rightcounter < 5) {
           FrightOn = true;

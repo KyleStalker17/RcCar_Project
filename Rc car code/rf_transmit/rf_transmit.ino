@@ -53,6 +53,10 @@ bool k3 = false;
 //library variables
 RH_ASK driver;
 
+uint8_t data[9]; //a variable to store all of the values which need to be sent
+  int datalen = sizeof(data);
+
+
 void setup()
 {
   Serial.begin(9600);// For development only. This will be deleted in the final product
@@ -78,7 +82,7 @@ void setup()
 
 void loop()
 {
-  uint8_t data[9]; //a variable to store all of the values which need to be sent
+  
   //collect data
   data[0] = ID;
   data[1] = gas;
@@ -89,13 +93,11 @@ void loop()
   data[6] = light;
   data[7] = headingDegrees;
   data[8] = reverse;
-
   //send data
-  int datalen = sizeof(data);
+  datalen = sizeof(data);
   driver.send((uint8_t *)data, sizeof(data));
-  driver.waitPacketSent();
+  //driver.waitPacketSent();
   delay(10);
-
   //compass read. This has to be done using the I2C communication protocol, it's a bit more complex and so gets its own section
   int x, y, z;
   Wire.beginTransmission(addr);
@@ -114,8 +116,6 @@ void loop()
   x = x * -1;
   heading = atan2(y, x);//the heading is the tangent between the x and y values.
   heading += 0.01126;// Account for local magnetic declination
-  Serial.print(heading);
-  Serial.print(",");
   if (heading < 0) {
     ;//account for cases where the heading is less than 1
     heading += 2 * PI;
@@ -131,10 +131,6 @@ void loop()
   else {
     headingDegrees -= 270;
   }
-
-  Serial.print (heading);
-  Serial.print(",");
-  Serial.println (headingDegrees);
 headingDegrees = (headingDegrees/1.5);
 
   /*
@@ -143,12 +139,11 @@ headingDegrees = (headingDegrees/1.5);
 
     //read all of the analog and digital input pins. A quirk with the radiohead library means that the values can't be larger than 256, so the analog values get divided by 10. We lose a little bit of resolution, but it's not a significant amount.
   */
-
   brake = analogRead(braking);
   brake = (brake / 10);
   gas = analogRead(gassing);
   gas = gas / 10;
-  head = analogRead(steering);
+  steer = analogRead(steering);
   steer = steer / 10;
   left = digitalRead(leftPin);
   right = digitalRead(rightPin);
@@ -163,4 +158,8 @@ headingDegrees = (headingDegrees/1.5);
   k3 = digitalRead(Key3);
   ID = ((k0 * 1) + (k1 * 2) + (k2 * 4) + (k3 * 8));//The pins on the key are a number encoded in binary. This will turn the number into decimal.
   ID = 1;
+
+  Serial.println(steering);
+
+  
 }
