@@ -80,33 +80,12 @@ void loop()
       light = buf[6];
       head = buf[7];
       reverse = buf[8];
-      /*
-                  Serial.print(buf[0]);
-                  Serial.print(",");
-                  Serial.print(buf[1]);
-                  Serial.print(",");
-                  Serial.print(buf[2]);
-                  Serial.print(",");
-                  Serial.print(buf[3]);
-                  Serial.print(",");
-                  Serial.print(buf[4]);
-                  Serial.print(",");
-                  Serial.print(buf[5]);
-                  Serial.print(",");
-                  Serial.print(buf[6]);
-                  Serial.print(",");
-                  Serial.print(buf[7]);
-                  Serial.print(",");
-                  Serial.print(buf[8]);
-                  Serial.print(",");
-                  Serial.println(reverse);
 
-      */
-      //Steering
+      // Steering
       steer = ((steer * 15) + 700);//Make sure it's the right value for the servo. This servo library requires values between 700 and 2200, with 1500 being the middle.
       Wheel.write(steer);
 
-      //forward/backwards Motion
+      // forward/backwards Motion
       gas_temp = ((gas_temp * 15) + 700);//Make sure it's the right value for the servo.
       if ((gas < gas_temp) && (reverse == false)) { //if the current speed is less than the desired speed and the car is in forward gear, speed up a little. This is to make sure the car can't accelerate instantly and has a sense of mass.
         gas += acc;
@@ -135,13 +114,9 @@ void loop()
 
       Motor.write(gas);//send instructions to the drive servo
 
-
-
       head = (head * 6.491);//math for servo value
       head = (head + 700);//make sure the minimum value is 700, or all the way left.
       Cam.write(head);//send to camera servo
-      Serial.print(head);
-      Serial.println(",");
       if (light == true) {//If the headlights need to be on, tell the headlights to turn on. This action won't actually be taken until all the light data is collected because we still need to check if the turn signal is on or off.
         FrightOn = true;
         FleftOn = true;

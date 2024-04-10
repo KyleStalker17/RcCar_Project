@@ -158,8 +158,5 @@ headingDegrees = (headingDegrees/1.5);
   k3 = digitalRead(Key3);
   ID = ((k0 * 1) + (k1 * 2) + (k2 * 4) + (k3 * 8));//The pins on the key are a number encoded in binary. This will turn the number into decimal.
   ID = 1;
-
-  Serial.println(steering);
-
   
 }
