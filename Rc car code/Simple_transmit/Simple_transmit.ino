@@ -15,6 +15,5 @@ void loop()
     const char *msg = "Hello World!";
     driver.send((uint8_t *)msg, strlen(msg));
     driver.waitPacketSent();
-    Serial.println(msg);
-    delay(500);
+    delay(1);
 }

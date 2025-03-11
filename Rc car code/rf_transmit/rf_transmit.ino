@@ -1,24 +1,20 @@
 //include libraries
-#include <RH_ASK.h> // radiohead library
-#include <SPI.h> // Not actually used but needed to compile
-#include <Wire.h> // I2C library used to communicate with the compass module
+#include <RH_ASK.h>  // radiohead library
+#include <SPI.h>     // Not actually used but needed to compile
+#include <Wire.h>    // I2C library used to communicate with the compass module
 
 //define pinouts
-#define gassing A0
+#define gassing A3
 #define braking A1
 #define steering A2
 #define leftPin 8
 #define rightPin 7
 #define Light 4
-#define Key0 3
-#define Key1 5
-#define Key2 9
-#define Key3 10
 #define reversePin 3
 
 #define addr 0x1E
 
-int ID = 1;// the reciever will only execute instructions from the controller with the correct ID. ID is set using a physical key that flips switches.
+int ID = 1;  // the reciever will only execute instructions from the controller with the correct ID.
 
 // Movement variables
 int gas = 0;
@@ -30,7 +26,7 @@ bool reverse = false;
 float head = 0;
 float heading = 0;
 float headingDegrees = 0;
-int x, y, z;//compass heading variable
+int x, y, z;  //compass heading variable
 
 //head/taillight control variables
 bool light = false;
@@ -53,36 +49,30 @@ bool k3 = false;
 //library variables
 RH_ASK driver;
 
-uint8_t data[9]; //a variable to store all of the values which need to be sent
-  int datalen = sizeof(data);
+uint8_t data[9];  //a variable to store all of the values which need to be sent
+int datalen = sizeof(data);
 
 
-void setup()
-{
-  Serial.begin(9600);// For development only. This will be deleted in the final product
+void setup() {
+  Serial.begin(9600);  // For development only. This will be deleted in the final product
   if (!driver.init())
     Serial.println("init failed");
   //Set input pinmodes
-  pinMode (Light, INPUT);
-  pinMode (leftPin, INPUT);
-  pinMode (rightPin, INPUT);
-  pinMode (Key0, INPUT);
-  pinMode (Key1, INPUT);
-  pinMode (Key2, INPUT);
-  pinMode (Key3, INPUT);
-  Wire.begin();
+  Serial.println("Start");
+  pinMode(Light, INPUT);
+  pinMode(leftPin, INPUT);
+  pinMode(rightPin, INPUT);
 
+  Wire.begin();
   Wire.beginTransmission(addr);
   Wire.write(0x02);
   Wire.write(0x00);
   Wire.endTransmission();
-  //compass.init();//start compass
+  Serial.println("Starting");
 }
 
 
-void loop()
-{
-  
+void loop() {
   //collect data
   data[0] = ID;
   data[1] = gas;
@@ -96,8 +86,8 @@ void loop()
   //send data
   datalen = sizeof(data);
   driver.send((uint8_t *)data, sizeof(data));
-  //driver.waitPacketSent();
-  delay(10);
+  driver.waitPacketSent();
+  delay(1);
   //compass read. This has to be done using the I2C communication protocol, it's a bit more complex and so gets its own section
   int x, y, z;
   Wire.beginTransmission(addr);
@@ -106,43 +96,47 @@ void loop()
 
   Wire.requestFrom(addr, 6);
   if (6 <= Wire.available()) {
-    x = Wire.read() << 8; //MSB  x
-    x |= Wire.read(); //LSB  x
-    z = Wire.read() << 8; //MSB  z
-    z |= Wire.read(); //LSB z
-    y = Wire.read() << 8; //MSB y
-    y |= Wire.read(); //LSB y
+    x = Wire.read() << 8;  //MSB  x
+    x |= Wire.read();      //LSB  x
+    z = Wire.read() << 8;  //MSB  z
+    z |= Wire.read();      //LSB z
+    y = Wire.read() << 8;  //MSB y
+    y |= Wire.read();      //LSB y
+  } else {
+    Serial.println("Compass failed");
   }
   x = x * -1;
-  heading = atan2(y, x);//the heading is the tangent between the x and y values.
-  heading += 0.01126;// Account for local magnetic declination
+  heading = atan2(y, x);  //the heading is the tangent between the x and y values.
+  heading += 0.01126;     // Account for local magnetic declination
   if (heading < 0) {
-    ;//account for cases where the heading is less than 1
+    ;  //account for cases where the heading is less than 1
     heading += 2 * PI;
   }
   if (heading > 2 * PI) {
     //account for if the heading is greater than 360 degrees
     heading -= 2 * PI;
   }
-  headingDegrees = heading * 180 / M_PI;//convert to degrees
+  headingDegrees = heading * 180 / M_PI;  //convert to degrees
   if (headingDegrees < 270) {
     headingDegrees += 90;
-  }
-  else {
+  } else {
     headingDegrees -= 270;
   }
-headingDegrees = (headingDegrees/1.5);
-
-  /*
-    head = (headingDegrees / 1.40625); //(1.40625 = 360 degrees /256). convert to a number small enough to be sent over
+  headingDegrees = (headingDegrees / 1.5);
 
 
-    //read all of the analog and digital input pins. A quirk with the radiohead library means that the values can't be larger than 256, so the analog values get divided by 10. We lose a little bit of resolution, but it's not a significant amount.
-  */
+  head = (headingDegrees / 1.40625);  //(1.40625 = 360 degrees /256). convert to a number small enough to be sent over
+
+
+  //read all of the analog and digital input pins. A quirk with the radiohead library means that the values can't be larger than 256, so the analog values get divided by 10, then multiplied by 10 on the other end once they've been transmitted. We lose a little bit of resolution, but it's not a significant amount.
   brake = analogRead(braking);
   brake = (brake / 10);
+  brake = (brake * 3.3);
   gas = analogRead(gassing);
   gas = gas / 10;
+  gas = gas - 15;
+  gas = gas * 2.6;
+  
   steer = analogRead(steering);
   steer = steer / 10;
   left = digitalRead(leftPin);
@@ -151,12 +145,13 @@ headingDegrees = (headingDegrees/1.5);
   reverse = digitalRead(reversePin);
 
 
-  //set the ID from the key.
-  k0 = digitalRead(Key0);
-  k1 = digitalRead(Key1);
-  k2 = digitalRead(Key2);
-  k3 = digitalRead(Key3);
-  ID = ((k0 * 1) + (k1 * 2) + (k2 * 4) + (k3 * 8));//The pins on the key are a number encoded in binary. This will turn the number into decimal.
   ID = 1;
-  
+  Serial.print("gas = ");
+  Serial.print(gas);
+  Serial.print(",");
+  Serial.print("left = ");
+  Serial.print(left);
+  Serial.print(",");
+  Serial.print("right = ");
+  Serial.println(right);
 }
